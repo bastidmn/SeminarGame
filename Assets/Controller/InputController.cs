@@ -1,12 +1,20 @@
 ﻿using System;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 namespace Controller
 {
     public class InputController : MonoBehaviour
     {
-        private void FixedUpdate()
+        private GameController _gameController;
+
+        private void Start()
+        {
+            _gameController = GameController.Instance;
+        }
+
+        private void Update()
         {
             if (Input.GetKey(KeyCode.W))
             {
@@ -25,34 +33,32 @@ namespace Controller
             }
             if (Input.GetKey(KeyCode.E))
             {
-                GameController.Instance.Interact();
             }
-            if (Input.GetKey(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                GameController.Instance.OpenPauseMenu();
+               LevelController controller = Camera.main.GetComponent<LevelController>();
+               if (controller.IsPaused())
+               {
+                   controller.EndPause();
+                   Time.timeScale = 1.0F;
+               }
+               else
+               {
+                   controller.Pause();
+                   Time.timeScale = 0.0F;
+               }
             }
-            if (Input.GetKey(KeyCode.P))
+
+            if (Input.GetKeyDown(KeyCode.P))
             {
                 GameController.Instance.ToogleBackgroundMusic();
             }
-            if (Input.GetKey(KeyCode.Escape) && Input.GetKey(KeyCode.LeftShift))
+            if (Input.GetKeyDown(KeyCode.Escape) && Input.GetKeyDown(KeyCode.LeftShift))
             {
-                GameController.Instance.EndGame();
+                EditorApplication.ExitPlaymode();
+                Application.Quit();
             }
         }
     }
     
-}
-
-enum Controls
-{
-    Forward,
-    Backward,
-    Left,
-    Right,
-    Jump,
-    Interact,
-    PauseMenu,
-    ToggleMusic,
-    EndGame,
 }
